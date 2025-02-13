@@ -1,0 +1,2 @@
+# Quick-Reversi
+【iOS】シンプルリバーシ
