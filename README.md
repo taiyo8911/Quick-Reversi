@@ -5,7 +5,17 @@
 Quick Reversi
 
 ## フォルダ構成
-
+```
+Othello/ 
+├── Models/
+│   └── OthelloModel.swift         // ゲームのロジックと盤面データの管理
+├── ViewModels/
+│   └── OthelloViewModel.swift     // モデルとビューの仲介（状態管理）
+├── Views/
+│   ├── OthelloBoardView.swift     // 盤面全体（セル含む）の表示とタップ処理
+│   └── ContentView.swift          // アプリのエントリーポイント
+└── OthelloGameApp.swift           // アプリのエントリーポイント（@main）
+```
 
 ## システム
 ### 🟢 1. ゲームの開始
