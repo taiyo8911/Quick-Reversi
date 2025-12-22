@@ -13,40 +13,58 @@ struct OthelloBoardView: View {
     let size = 8
     
     var body: some View {
-        VStack {
-            // 現在のプレイヤーまたはゲーム結果を表示
-            Text(viewModel.isGameOver ? viewModel.gameOverText : "現在のプレイヤー: \(viewModel.currentPlayer == .black ? "黒" : "白")")
-                .font(.title)
-                .padding()
-            
-            // 盤面の表示
-            ForEach(0..<size, id: \.self) { row in
-                HStack {
-                    ForEach(0..<size, id: \.self) { col in
-                        CellView(stone: viewModel.board[row][col])
-                            .onTapGesture {
-                                viewModel.placeStone(row: row, col: col)
-                            }
+        VStack(spacing: 0) {
+            // 上部：黒プレイヤー用の手番表示（180度回転）
+            Text("⚫")
+                .font(viewModel.currentPlayer == .black && !viewModel.isGameOver ? .system(size: 40, weight: .bold) : .system(size: 32))
+                .opacity(viewModel.currentPlayer == .black && !viewModel.isGameOver ? 1.0 : 0.3)
+                .padding(.vertical, 20)
+                .frame(maxWidth: .infinity)
+                .rotationEffect(.degrees(180))
+
+            Spacer()
+
+            // 中央：盤面の表示
+            VStack(spacing: 0) {
+                ForEach(0..<size, id: \.self) { row in
+                    HStack(spacing: 0) {
+                        ForEach(0..<size, id: \.self) { col in
+                            CellView(stone: viewModel.board[row][col])
+                                .onTapGesture {
+                                    viewModel.placeStone(row: row, col: col)
+                                }
+                        }
                     }
                 }
             }
-            
+
             Spacer()
-                .frame(height: 20) // ボタン表示用に一定のスペースを確保
-            
-            // もう一度あそぶボタン
+
+            // ゲーム終了時のメッセージとボタン
             if viewModel.isGameOver {
-                Button("もう一度あそぶ") {
-                    viewModel.resetGame()
+                VStack(spacing: 10) {
+                    Text(viewModel.gameOverText)
+                        .font(.title2)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
+                    Button("もう一度あそぶ") {
+                        viewModel.resetGame()
+                    }
+                    .font(.headline)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
                 }
-                .font(.headline)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
+                .padding(.vertical, 20)
             } else {
-                Spacer()
-                    .frame(height: 50) // ボタンがないときもスペースを確保
+                // 下部：白プレイヤー用の手番表示
+                Text("⚪")
+                    .font(viewModel.currentPlayer == .white ? .system(size: 40, weight: .bold) : .system(size: 32))
+                    .opacity(viewModel.currentPlayer == .white ? 1.0 : 0.3)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: .infinity)
             }
         }
     }
