@@ -15,7 +15,7 @@ struct OthelloBoardView: View {
     var body: some View {
         VStack {
             // 現在のプレイヤーまたはゲーム結果を表示
-            Text(viewModel.isGameOver ? viewModel.gameOverText : "現在のプレイヤー: \(viewModel.currentPlayer == .black ? "黒" : "白")")
+            Text(viewModel.isGameOver ? viewModel.gameOverText : "\(viewModel.currentPlayer == .black ? "黒" : "白")のターン")
                 .font(.title)
                 .padding()
             
