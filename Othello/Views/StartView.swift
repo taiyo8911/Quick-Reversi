@@ -12,55 +12,84 @@ struct StartView: View {
     @State private var isPresented: Bool = false // 画面遷移フラグ
     @ObservedObject var viewModel = OthelloViewModel()
 
+    private let boardGreen = Color(red: 0.07, green: 0.24, blue: 0.16)
+    private let boardGreenLight = Color(red: 0.10, green: 0.34, blue: 0.22)
+
     var body: some View {
         ZStack {
-            // 背景
-            Color.green
-                .edgesIgnoringSafeArea(.all)
-                .overlay(
-                    // 背景のアニメーション
-                    MovingCircles()
-                )
+            // 背景: 深いグリーンのグラデーション
+            LinearGradient(
+                colors: [boardGreen, boardGreenLight],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
 
-            VStack {
+            // 柔らかなハイライト
+            RadialGradient(
+                colors: [Color.white.opacity(0.12), .clear],
+                center: .top,
+                startRadius: 0,
+                endRadius: 420
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
                 Spacer()
 
-                // タイトル
-                Text("リバーシ")
-                    .font(.system(size: 50, weight: .bold, design: .rounded))
-                    .foregroundColor(.black)
-                    .opacity(isAnimating ? 1 : 0)
-                    .animation(.easeOut(duration: 1), value: isAnimating)
-                
-                Spacer()
-                
-                // ゲーム開始ボタン
-                Button(action: {
-                    // ゲーム開始処理（画面遷移など)
-                    isPresented = true // 画面遷移フラグを立てる
-
-                }) {
-                    Text("ゲーム開始")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding()
-                        .frame(width: 200)
-                        .background(Color.white)
-                        .foregroundColor(.black)
-                        .cornerRadius(12)
-                        .shadow(radius: 10)
+                // オセロを象徴する黒白のディスク
+                ZStack {
+                    DiscView(color: .white)
+                        .offset(x: -26)
+                    DiscView(color: .black)
+                        .offset(x: 26)
                 }
                 .opacity(isAnimating ? 1 : 0)
-                .offset(y: isAnimating ? 0 : 50)
-                .animation(.spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0), value: isAnimating)
-                .padding(.bottom, 50)
+                .scaleEffect(isAnimating ? 1 : 0.85)
+                .animation(.easeOut(duration: 0.9), value: isAnimating)
+
+                Spacer().frame(height: 44)
+
+                // タイトル
+                Text("Reversi")
+                    .font(.system(size: 56, weight: .semibold, design: .serif))
+                    .foregroundColor(.white)
+                    .tracking(4)
+                    .opacity(isAnimating ? 1 : 0)
+                    .animation(.easeOut(duration: 1).delay(0.2), value: isAnimating)
+
+                Spacer()
+
+                // ゲーム開始ボタン
+                Button(action: {
+                    isPresented = true
+                }) {
+                    HStack(spacing: 10) {
+                        Text("Start Game")
+                            .font(.system(size: 17, weight: .semibold))
+                            .tracking(1)
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(boardGreen)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(
+                        Capsule()
+                            .fill(Color.white)
+                            .shadow(color: .black.opacity(0.25), radius: 14, x: 0, y: 6)
+                    )
+                }
+                .padding(.horizontal, 40)
+                .opacity(isAnimating ? 1 : 0)
+                .offset(y: isAnimating ? 0 : 30)
+                .animation(.spring(response: 0.7, dampingFraction: 0.78).delay(0.5), value: isAnimating)
                 .fullScreenCover(isPresented: $isPresented) {
                     OthelloBoardView(viewModel: viewModel)
                 }
-                        
-                Spacer()
+
+                Spacer().frame(height: 120)
             }
-            .padding()
         }
         .onAppear {
             isAnimating = true
@@ -68,28 +97,19 @@ struct StartView: View {
     }
 }
 
-// 背景の動く光のエフェクト
-struct MovingCircles: View {
-    @State private var animate = false
+// オセロの石モチーフ
+private struct DiscView: View {
+    let color: Color
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.white.opacity(0.1))
-                .frame(width: 300, height: 300)
-                .offset(x: animate ? 100 : -100, y: animate ? -200 : 200)
-                .blur(radius: 50)
-            
-            Circle()
-                .fill(Color.white.opacity(0.05))
-                .frame(width: 400, height: 400)
-                .offset(x: animate ? -150 : 150, y: animate ? 150 : -150)
-                .blur(radius: 60)
-        }
-        .animation(Animation.easeInOut(duration: 5).repeatForever(autoreverses: true), value: animate)
-        .onAppear {
-            animate.toggle()
-        }
+        Circle()
+            .fill(color)
+            .frame(width: 72, height: 72)
+            .overlay(
+                Circle()
+                    .strokeBorder(Color.white.opacity(color == .black ? 0.08 : 0), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.35), radius: 10, x: 0, y: 5)
     }
 }
 
